@@ -237,14 +237,14 @@ object Simulation {
      * Synthetic workloads for testing.
      * These can probably be deleted eventually.
      */
-    val synthWorkloadGeneratorService = 
+    val synthWorkloadGeneratorService =
         new ExpExpExpWorkloadGenerator(workloadName = "Service".intern(),
                                        initAvgJobInterarrivalTime = 5.0,
                                        avgTasksPerJob = 100,
                                        avgJobDuration = 10.0,
                                        avgCpusPerTask = 1.0,
                                        avgMemPerTask = 1.5)
-    val synthWorkloadGeneratorBatch = 
+    val synthWorkloadGeneratorBatch =
         new ExpExpExpWorkloadGenerator(workloadName = "Batch".intern(),
                                        initAvgJobInterarrivalTime = 3.0,
                                        avgTasksPerJob = 100,
@@ -283,7 +283,7 @@ object Simulation {
                                         // (1.5 to 10.0 by 1.0).toList
 
     val fullPickinessRange: List[Double] = (0.00 to 0.75 by 0.05).toList
- 
+
 
     val medConstantRange: List[Double] = 0.01 :: 0.05 :: 0.1 :: 0.5 ::
                                          1.0 :: 5.0 :: 10.0:: 50.0 ::
@@ -557,8 +557,8 @@ object Simulation {
             workloadToSweepOver = mesosWorkloadToSweep,
             workloadDescs = wlDescs,
             schedulerWorkloadsToSweepOver = mesosSchedWorkloadsToSweep,
-            // constantThinkTimeRange = (0.1 :: Nil), 
-            constantThinkTimeRange = constantRange, 
+            // constantThinkTimeRange = (0.1 :: Nil),
+            constantThinkTimeRange = constantRange,
             perTaskThinkTimeRange = (0.005 :: Nil),
             blackListPercentRange = (0.0 :: Nil),
             schedulerWorkloadMap = mesosSchedulerWorkloadMap,
@@ -741,7 +741,7 @@ object Simulation {
       }}
     }
 
-          
+
     /* Make a snapshot of the source file that has our settings in it */
     println("Making a copy of Simulation.scala in %s"
             .format(outputDirName))
@@ -804,7 +804,7 @@ object Simulation {
                 .format(completed.length, numFinishedExps, numTotalExps))
       }
       completed.foreach(x => try x.get() catch {
-        case e => e.printStackTrace()
+        case e : Throwable => e.printStackTrace()
       })
       futures = running
     }

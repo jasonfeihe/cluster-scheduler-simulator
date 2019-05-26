@@ -55,9 +55,7 @@ abstract class Simulator(logging: Boolean = false){
   def currentTime: Double = curtime
 
   def log(s: => String) {
-    if (!logging) {
-      null
-    } else {
+    if (logging) {
       println(curtime + " " + s)
     }
   }
@@ -127,7 +125,7 @@ abstract class ClusterSimulatorDesc(val runTime: Double) {
  * (single agent, dynamically partitioned,and replicated state), based
  * on a set of input parameters that define the schedulers being used
  * and the workload being played.
- * @param schedulers A Map from schedulerName to Scheduler, should 
+ * @param schedulers A Map from schedulerName to Scheduler, should
  *       exactly one entry for each scheduler that is registered with
  *       this simulator.
  * @param workloadToSchedulerMap A map from workloadName to Seq[SchedulerName].
@@ -223,7 +221,7 @@ class ClusterSimulator(val cellState: CellState,
         //                job.id,
         //                job.cpusPerTask * job.numTasks,
         //                job.memPerTask * job.numTasks))
-        if (job.cpusPerTask * job.numTasks > cellState.totalCpus + 0.000001 || 
+        if (job.cpusPerTask * job.numTasks > cellState.totalCpus + 0.000001 ||
             job.memPerTask * job.numTasks > cellState.totalMem + 0.000001) {
           println(("WARNING: The cell (%f cpus, %f mem) is not big enough " +
                   "to hold job id %d all at once which requires %f cpus " +
@@ -384,7 +382,7 @@ abstract class Scheduler(val name: String,
   var numSuccessfulTaskTransactions: Int = 0
   var numFailedTaskTransactions: Int = 0
   var numNoResourcesFoundSchedulingAttempts: Int = 0
-  // When trying to place a task, count the number of machines we look at 
+  // When trying to place a task, count the number of machines we look at
   // that the task doesn't fit on. This is a sort of wasted work that
   // causes the simulation to go slow.
   var failedFindVictimAttempts: Int = 0
@@ -433,7 +431,7 @@ abstract class Scheduler(val name: String,
    * Creates and applies ClaimDeltas for all available resources in the
    * provided {@code cellState}. This is intended to leave no resources
    * free in cellState, thus it doesn't use minCpu or minMem because that
-   * could lead to leaving fragmentation. I haven't thought through 
+   * could lead to leaving fragmentation. I haven't thought through
    * very carefully if floating point math could cause a problem here.
    */
   def scheduleAllAvailable(cellState: CellState,
@@ -745,7 +743,7 @@ class CellState(val numMachines: Int,
                    machineID,
                    hashCode(),
                    availableCpusPerMachine(machineID)))
-    assert(availableMemPerMachine(machineID) >= mem, 
+    assert(availableMemPerMachine(machineID) >= mem,
            ("Scheduler %s (%d) tried to claim %f mem on machine %d in cell " +
             "state %d, but it only has %f mem unallocated right now.")
            .format(scheduler.name,
@@ -824,7 +822,7 @@ class CellState(val numMachines: Int,
                dest = newCellState.allocatedMemPerMachine,
                destPos = 0,
                length = numMachines)
-    Array.copy(src = machineSeqNums, 
+    Array.copy(src = machineSeqNums,
                srcPos = 0,
                dest = newCellState.machineSeqNums,
                destPos = 0,
@@ -862,7 +860,7 @@ class CellState(val numMachines: Int,
             rollback = true
             return
           } else if (transactionMode == "incremental") {
-            
+
           } else {
             sys.error("Invalid transactionMode.")
           }
@@ -882,8 +880,8 @@ class CellState(val numMachines: Int,
         appliedDeltas -= d
       })
     }
-    
-    if (scheduleEndEvent) { 
+
+    if (scheduleEndEvent) {
       scheduleEndEvents(appliedDeltas)
     }
     new CommitResult(appliedDeltas, conflictDeltas)
@@ -931,7 +929,7 @@ class CellState(val numMachines: Int,
       case "resource-fit" => {
         // Check if the machine is currently short of resources,
         // regardless of whether sequence nums have changed.
-        if (availableCpusPerMachine(delta.machineID) < delta.cpus || 
+        if (availableCpusPerMachine(delta.machineID) < delta.cpus ||
             availableMemPerMachine(delta.machineID) <  delta.mem) {
           simulator.log("Resource-aware conflict occurred " +
                         "(sched-%s, mach-%d, cpus-%f, mem-%f)."
@@ -950,7 +948,7 @@ class CellState(val numMachines: Int,
       }
     }
   }
-} 
+}
 
 /**
  * @param submitted   the time the job was submitted in seconds
@@ -1192,7 +1190,7 @@ class Workload(val name: String,
 
 case class WorkloadDesc(cell: String,
                         assignmentPolicy: String,
-                        // getJob(0) is called 
+                        // getJob(0) is called
                         workloadGenerators: List[WorkloadGenerator],
                         cellStateDesc: CellStateDesc,
                         prefillWorkloadGenerators: List[WorkloadGenerator] =
@@ -1234,7 +1232,7 @@ trait WorkloadGenerator {
                   maxCpus: Option[Double] = None,
                   maxMem: Option[Double] = None,
                   updatedAvgJobInterarrivalTime: Option[Double] = None)
-                 : Workload 
+                 : Workload
 }
 
 /**
@@ -1459,7 +1457,7 @@ class InterarrivalTimeTraceExpExpWLGenerator(val workloadName: String,
     } else {
       val below = refDistribution(math.floor(rawIndex).toInt)
       val above = refDistribution(math.ceil(rawIndex).toInt)
-      return below + interpAmount * (below + above) 
+      return below + interpAmount * (below + above)
     }
   }
 
@@ -1557,7 +1555,7 @@ class TraceWLGenerator(val workloadName: String,
     } else {
       val below = empDistribution(math.floor(rawIndex).toInt)
       val above = empDistribution(math.ceil(rawIndex).toInt)
-      return below + interpAmount * (below + above) 
+      return below + interpAmount * (below + above)
     }
   }
 
@@ -1667,7 +1665,7 @@ class TraceAllWLGenerator(val workloadName: String,
     } else {
       val below = empDistribution(math.floor(rawIndex).toInt)
       val above = empDistribution(math.ceil(rawIndex).toInt)
-      return below + interpAmount * (below + above) 
+      return below + interpAmount * (below + above)
     }
   }
 
@@ -1926,4 +1924,3 @@ class PrefillPbbTraceWorkloadGenerator(val workloadName: String,
     workload
   }
 }
-

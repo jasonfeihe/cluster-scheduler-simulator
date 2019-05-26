@@ -118,7 +118,7 @@ class Experiment(
             i * workloadDesc.cellStateDesc.numMachines *
             workloadDesc.cellStateDesc.cpusPerMachine
         })
-                      
+
         val memMaxOpt = prefillMemLimits.get(wlGen.workloadName).map(i => {
           i * workloadDesc.cellStateDesc.numMachines *
           workloadDesc.cellStateDesc.memPerMachine
@@ -137,7 +137,7 @@ class Experiment(
 
       // Parameter sweep over lambda.
       // If we have a range for lambda, loop over it, else
-      // we just loop over a list holding a single element: None 
+      // we just loop over a list holding a single element: None
       val jobInterarrivalRange = avgJobInterarrivalTimeRange match {
         case Some(paramsRange) => paramsRange.map(Some(_))
         case None => List(None)
@@ -163,7 +163,7 @@ class Experiment(
             // workload we are supposed to sweep over. If this is not a
             // lambda parameter sweep then updatedAvgJobInterarrivalTime
             // will remain None after this line is executed.
-            newAvgJobInterarrivalTime = avgJobInterarrivalTime          
+            newAvgJobInterarrivalTime = avgJobInterarrivalTime
           }
           println("Generating new Workload %s for window %f seconds long."
                   .format(workloadGenerator.workloadName, simulatorDesc.runTime))
@@ -235,7 +235,7 @@ class Experiment(
                   workloadStats.setNumJobs(workload.numJobs)
                   workloadStats.setNumJobsScheduled(
                       workload.getJobs.filter(_.numSchedulingAttempts > 0).length)
-                  workload
+                  // workload
                   workloadStats.setJobThinkTimes90Percentile(
                       workload.jobUsefulThinkTimesPercentile(0.9))
                   workloadStats.setAvgJobQueueTimesTillFirstScheduled(
@@ -285,7 +285,7 @@ class Experiment(
                   println("Computing daily stats for days 0 through %d."
                           .format(daysRan))
                   (0 to daysRan).foreach {
-                      day: Int => { 
+                      day: Int => {
                     val perDayStats =
                         ExperimentResultSet.
                         ExperimentEnv.
@@ -316,7 +316,7 @@ class Experiment(
 
                   assert(scheduler.perWorkloadUsefulTimeScheduling.size ==
                          scheduler.perWorkloadWastedTimeScheduling.size,
-                         "the maps held by Scheduler to track per workload " + 
+                         "the maps held by Scheduler to track per workload " +
                          "useful and wasted time should be the same size " +
                          "(Scheduler.addJob() should ensure this).")
                   scheduler.perWorkloadUsefulTimeScheduling.foreach{
@@ -390,8 +390,8 @@ class Experiment(
                 // a lot of the stats below, so that the we can be sure
                 // which column is which when we print the stats.
                 val sortedSchedulers = simulator
-                    .schedulers.values.toList.sort(_.name < _.name)
-                val sortedWorkloads = workloads.toList.sort(_.name < _.name)
+                    .schedulers.values.toList.sortWith(_.name < _.name)
+                val sortedWorkloads = workloads.toList.sortWith(_.name < _.name)
 
                 // Sorted names of workloads.
                 var workloadNames = sortedWorkloads.map(_.name).mkString(" ")
@@ -405,7 +405,7 @@ class Experiment(
                 }).mkString(" ")
 
                 // Sorted names of Schedulers.
-                val schedNames = sortedSchedulers.map(_.name).mkString(" ") 
+                val schedNames = sortedSchedulers.map(_.name).mkString(" ")
 
                 // Calculate per scheduler successful, failed, retried
                 // transaction conflict rates.
@@ -436,7 +436,7 @@ class Experiment(
 
                 // Calculate per scheduler aggregate (useful + wasted) busy time.
                 val schedBusyTimes = sortedSchedulers.map(sched => {
-                  println(("calculating busy time for sched %s as " + 
+                  println(("calculating busy time for sched %s as " +
                           "(%f + %f) / %f = %f.")
                           .format(sched.name,
                                   sched.totalUsefulTimeScheduling,
@@ -463,7 +463,7 @@ class Experiment(
                 val perWorkloadSchedBusyTimes = sortedSchedulers.map(sched => {
                   // Sort by workload name.
                   val sortedSchedulingTimes =
-                    sched.perWorkloadUsefulTimeScheduling.toList.sort(_._1<_._1)
+                    sched.perWorkloadUsefulTimeScheduling.toList.sortWith(_._1<_._1)
                   sortedSchedulingTimes.map(nameTimePair => {
                     (nameTimePair._2 +
                      sched.perWorkloadWastedTimeScheduling(nameTimePair._1)) /
@@ -548,8 +548,8 @@ class Experiment(
                                   "avg mem util: %f \n" +
                                   "num workloads %d \n" +
                                   "workload names: %s \n" +
-                                  "numjobs: %s \n" + 
-                                  "num jobs scheduled: %s \n" + 
+                                  "numjobs: %s \n" +
+                                  "num jobs scheduled: %s \n" +
                                   "perWorkloadSchedBusyTimes: %s \n" +
                                   "jobThinkTimes90Percentile: %s \n" +
                                   "avgJobQueueTimesTillFirstScheduled: %s \n" +
@@ -568,17 +568,17 @@ class Experiment(
                                   "schedUsefulBusyTimes: %s \n" +
                                   "schedWastedBusyTimes: %s \n" +
                                   "schedSuccessfulTransactions: %s \n" +
-                                  "schedFailedTransactions: %s \n" +     
+                                  "schedFailedTransactions: %s \n" +
                                   "schedNoResorucesFoundSchedAttempt: %s \n" +
                                   "schedRetriedTransactions: %s \n" +
                                   "schedSuccessfulTaskTransactions: %s \n" +
-                                  "schedFailedTaskTransactions: %s \n" +     
-                                  "schedNumJobsTimedOutScheduling: %s \n" +     
+                                  "schedFailedTaskTransactions: %s \n" +
+                                  "schedNumJobsTimedOutScheduling: %s \n" +
                                   "schedulerIsMultiPaths: %s \n" +
                                   "schedulerNumJobsLeftInQueue: %s \n" +
                                   "workloadToSweepOver: %s \n" +
                                   "avgJobInterarrivalTime: %f \n" +
-                                  "constantThinkTime: %f \n" + 
+                                  "constantThinkTime: %f \n" +
                                   "perTaskThinkTime %f").format(
                     workloadDesc.cell,                                  // %s
                     workloadDesc.assignmentPolicy,                      // %s
